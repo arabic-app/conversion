@@ -3,28 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur d'Attestation de Conversion à l'Islam</title>
+    <title>Attestation de Conversion</title>
     <style>
-        /* Styles de base */
+        /* Styles de base pour l'écran */
         body { 
             font-family: 'Arial', sans-serif; 
             margin: 0; 
             padding: 20px; 
-            background: #f0f2f5; 
+            background: #525659; /* Couleur de fond style visionneuse PDF */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .no-print { display: block; }
         .bold { font-weight: bold; }
 
         /* Formulaire */
         .form-container {
-            max-width: 600px; 
-            margin: 0 auto 20px; 
+            width: 210mm; /* Largeur A4 pour correspondre au doc */
             background: white; 
             padding: 20px;
             border-radius: 8px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            box-sizing: border-box;
         }
-        .form-title { margin-top: 0; text-align: center; color: #333; }
         .form-group { margin-bottom: 15px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #444; }
         .form-group input, .form-group select { 
@@ -33,97 +35,127 @@
         }
         .btn { 
             background: #28a745; color: white; border: none; 
-            padding: 12px 20px; cursor: pointer; border-radius: 4px; 
-            font-size: 16px; width: 100%; font-weight: bold; margin-top: 10px;
+            padding: 15px; cursor: pointer; border-radius: 4px; 
+            font-size: 16px; width: 100%; font-weight: bold;
         }
-        .btn:hover { background: #218838; }
 
-        /* Conteneur du Certificat */
-        .certificate-container {
-            max-width: 800px; 
-            margin: 0 auto; 
-            background: white; 
-            padding: 50px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        /* Conteneur du Certificat - FORMAT A4 EXACT */
+        .page-a4 {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            padding: 20mm; /* Marges du document */
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            box-sizing: border-box;
             position: relative;
         }
         
-        /* En-tête */
+        /* En-tête (Header) */
         .header { 
-            display: flex; justify-content: space-between; 
-            align-items: flex-start; margin-bottom: 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start; 
+            margin-bottom: 30px; 
         }
-        .header-left { text-align: left; font-size: 14px; line-height: 1.5; }
-        .header-center { text-align: center; flex-grow: 1; margin-left: 20px;}
-        .title-ar { font-size: 28px; font-weight: bold; margin: 0; font-family: 'Times New Roman', serif; }
-        .title-fr { font-size: 20px; font-weight: bold; margin: 5px 0; }
-        .subtitle { font-size: 16px; margin: 0; font-style: italic; }
+        .header-left { 
+            text-align: left; 
+            font-size: 14px; 
+            line-height: 1.5; 
+            width: 30%;
+        }
+        .header-center { 
+            text-align: center; 
+            width: 40%;
+        }
+        .header-right {
+            text-align: right;
+            width: 30%;
+        }
+        
+        /* LOGO */
+        .logo {
+            max-width: 120px;
+            max-height: 120px;
+            object-fit: contain;
+        }
+
+        .title-ar { font-size: 26px; font-weight: bold; margin: 0; font-family: 'Times New Roman', serif; }
+        .title-fr { font-size: 16px; font-weight: bold; margin: 5px 0; }
+        .subtitle { font-size: 14px; margin: 0; font-style: italic; }
 
         .bismillah { 
-            text-align: center; font-size: 22px; margin-bottom: 40px; 
+            text-align: center; font-size: 20px; margin-bottom: 30px; 
             font-family: 'Times New Roman', serif; direction: rtl;
         }
         
         /* Contenu du texte */
-        .content { margin-bottom: 40px; }
         .text-ar { 
-            direction: rtl; text-align: justify; font-size: 22px; 
-            font-family: 'Times New Roman', serif; line-height: 1.8; margin-bottom: 30px; 
+            direction: rtl; text-align: justify; font-size: 20px; 
+            font-family: 'Times New Roman', serif; line-height: 1.8; margin-bottom: 40px; 
         }
         .text-fr { 
-            text-align: justify; font-size: 16px; 
+            text-align: justify; font-size: 15px; 
             line-height: 1.6; margin-bottom: 20px; 
         }
         
         /* Signatures */
-        .signatures { display: flex; justify-content: space-between; margin-top: 60px; }
-        .signature-box { text-align: center; width: 45%; }
+        .signatures { display: flex; justify-content: space-around; margin-top: 60px; }
+        .signature-box { text-align: center; }
         .sig-ar { font-weight: bold; font-family: 'Times New Roman', serif; font-size: 20px; margin-bottom: 5px;}
-        .sig-fr { font-weight: bold; font-size: 16px;}
+        .sig-fr { font-weight: bold; font-size: 15px;}
         
         /* Pied de page */
         .footer { 
-            margin-top: 80px; text-align: center; font-size: 10px; 
-            border-top: 1px solid #ccc; padding-top: 10px; color: #555;
+            position: absolute;
+            bottom: 20mm;
+            left: 20mm;
+            right: 20mm;
+            text-align: center; font-size: 11px; 
+            border-top: 1px solid #000; padding-top: 10px;
         }
 
-        /* Mode Impression (PDF) */
+        /* Mode Impression (Génération PDF) */
         @media print {
-            body { background: white; padding: 0; }
-            .no-print { display: none !important; }
-            .certificate-container { 
-                box-shadow: none; padding: 0; max-width: 100%; margin: 0; 
+            body { background: white; padding: 0; margin: 0; display: block; }
+            .form-container { display: none !important; }
+            .page-a4 { 
+                box-shadow: none; padding: 20mm; width: 100%; height: 100%; margin: 0; page-break-after: avoid;
             }
+            @page { size: A4; margin: 0; } /* Supprime les marges par défaut du navigateur */
         }
     </style>
 </head>
 <body>
 
-    <div class="form-container no-print">
-        <h2 class="form-title">Informations du Converti(e)</h2>
+    <div class="form-container">
+        <h2>Données de l'Attestation</h2>
         <div class="form-group">
-            <label for="fullname">Prénom NOM :</label>
-            <input type="text" id="fullname" placeholder="Ex: Kevin RODRIGUES" oninput="updateCertificate()">
+            <label>Prénom NOM (en français) :</label>
+            <input type="text" id="fullname_fr" placeholder="Ex: Kevin RODRIGUES" oninput="updateArabicName(); updateCertificate();">
         </div>
         <div class="form-group">
-            <label for="gender">Genre :</label>
+            <label>Prénom NOM (en arabe) - <i>Généré auto si vide</i> :</label>
+            <input type="text" id="fullname_ar" dir="rtl" placeholder="Ex: كيفين رودريغيس" oninput="updateCertificate()">
+        </div>
+        <div class="form-group">
+            <label>Genre :</label>
             <select id="gender" onchange="updateCertificate()">
                 <option value="m">Masculin (Frère)</option>
                 <option value="f">Féminin (Sœur)</option>
             </select>
         </div>
         <div class="form-group">
-            <label for="dob">Date de naissance :</label>
+            <label>Date de naissance :</label>
             <input type="date" id="dob" onchange="updateCertificate()">
         </div>
         <div class="form-group">
-            <label for="doc">Date de reconversion (Attestation de foi) :</label>
+            <label>Date de reconversion :</label>
             <input type="date" id="doc" onchange="updateCertificate()">
         </div>
-        <button class="btn" onclick="window.print()">🖨️ Imprimer / Sauvegarder en PDF</button>
+        <button class="btn" onclick="window.print()">🖨️ Générer le PDF (Imprimer)</button>
     </div>
 
-    <div class="certificate-container">
+    <div class="page-a4">
         <div class="header">
             <div class="header-left">
                 <span class="bold">Mosquée Al Houda</span><br>
@@ -136,89 +168,5 @@
                 <p class="title-fr">ATTESTATION DE CONVERSION A L'ISLAM</p>
                 <p class="subtitle">Masjid Al Houda<br>De Clermont-Ferrand</p>
             </div>
-        </div>
-
-        <div class="bismillah">
-            بسم الله الرحمن الرحيم وصلى الله وسلم على محمد وعلى آله وصحبه وبعد،
-        </div>
-
-        <div class="content">
-            <div class="text-ar" id="ar-content">
-                </div>
-            
-            <div class="text-fr" id="fr-content">
-                </div>
-        </div>
-
-        <div class="signatures">
-            <div class="signature-box">
-                <div class="sig-ar">رئيس الجمعية</div>
-                <div class="sig-fr">Président de l'association</div>
-            </div>
-            <div class="signature-box">
-                <div class="sig-ar">إمام المسجد</div>
-                <div class="sig-fr">Imam de la mosquée</div>
-            </div>
-        </div>
-
-        <div class="footer">
-            Déclaration au Journal Officiel de la préfecture du Puy-de-Dôme FRANCE, ASSOCIATION DES JEUNES D'AUVERGNE POUR LE BIEN. Annonce n° 547 63
-        </div>
-    </div>
-
-    <script>
-        function updateCertificate() {
-            // Récupération des valeurs
-            const fullname = document.getElementById('fullname').value || '[Prénom NOM]';
-            const gender = document.getElementById('gender').value;
-            const dobInput = document.getElementById('dob').value;
-            const docInput = document.getElementById('doc').value;
-
-            // Fonction pour formater les dates YYYY-MM-DD en DD/MM/YYYY
-            const formatDate = (dateStr) => {
-                if(!dateStr) return '[JJ/MM/AAAA]';
-                const parts = dateStr.split('-');
-                return `${parts[2]}/${parts[1]}/${parts[0]}`;
-            };
-
-            const dob = formatDate(dobInput);
-            const doc = formatDate(docInput);
-            
-            // Date du jour pour "Fait à..."
-            const todayObj = new Date();
-            const today = `${String(todayObj.getDate()).padStart(2, '0')}/${String(todayObj.getMonth() + 1).padStart(2, '0')}/${todayObj.getFullYear()}`;
-
-            // --- Adaptations Arabes ---
-            const arTitle = gender === 'm' ? 'الأخ' : 'الأخت';
-            const arBorn = gender === 'm' ? 'المولود' : 'المولودة';
-            const arEmbraced = gender === 'm' ? 'اعتنق' : 'اعتنقت';
-            const arPronounced = gender === 'm' ? 'نطق' : 'نطقت';
-            const arTo = gender === 'm' ? 'له' : 'لها';
-
-            // --- Adaptations Françaises ---
-            const frTitle = gender === 'm' ? 'le frère' : 'la sœur';
-            const frBorn = gender === 'm' ? 'né' : 'née';
-            const frPronoun = gender === 'm' ? 'il a' : 'elle a';
-
-            // Injection du texte Arabe
-            document.getElementById('ar-content').innerHTML = `
-                أنا الممضي أسفله، عز الدين خامله، إمام مسجد الهدى بمدينة كلارمون فارون بفرنسا، أشهد أن<br>
-                ${arTitle} <span class="bold">${fullname}</span> ${arBorn} بتاريخ <span class="bold">${dob}</span> ${arEmbraced} بفضل الله الدين الإسلامي.<br>
-                وقد ${arPronounced} بالشهادتين منذ <span class="bold">${doc}</span><br>
-                وقد منحت ${arTo} هذه الشهادة للإدلاء بها عند الحاجة.<br>
-                حرر في كلارمون فارون بتاريخ <span class="bold">${today}</span>
-            `;
-
-            // Injection du texte Français
-            document.getElementById('fr-content').innerHTML = `
-                Je soussigné, Azedine KHAMALLAH, Imam de la mosquée Al Houda à CLERMONT FERRAND (France), certifie que ${frTitle} <span class="bold">${fullname}</span> ${frBorn} le <span class="bold">${dob}</span> a embrassé l'Islam, par la grâce d'Allah, et ${frPronoun} prononcé l'attestation de foi depuis <span class="bold">${doc}</span>.<br><br>
-                Ce certificat lui a été délivré pour servir et valoir ce que de droit.<br><br>
-                Fait à Clermont-Ferrand le <span class="bold">${today}</span>
-            `;
-        }
-
-        // Initialisation au chargement de la page
-        window.onload = updateCertificate;
-    </script>
-</body>
-</html>
+            <div class="header-right">
+                <img src="
