@@ -132,10 +132,10 @@
         <center><h2>ATTESTATION DE CONVERSION A L'ISLAM</h2></center>
         <div class="form-group">
             <label>Prénom NOM (en français) :</label>
-            <input type="text" id="fullname_fr" placeholder="Ex: Kevin LEGRAND" oninput="updateArabicName(); updateCertificate();">
+            <input type="text" id="fullname_fr" placeholder="Ex: Kevin LEGRAND" onblur="updateArabicName()">
         </div>
         <div class="form-group">
-            <label>Prénom NOM (en arabe) - <i>Généré auto si vide</i> :</label>
+            <label>Prénom NOM (en arabe) - <i>Généré via Google si vide</i> :</label>
             <input type="text" id="fullname_ar" dir="rtl" placeholder="Ex: كيفين لوجران" oninput="updateCertificate()">
         </div>
         <div class="form-group">
@@ -198,49 +198,72 @@
     </div>
 
     <script>
-        // Fonction simple de translittération phonétique (Français -> Arabe)
-        function transliterateToArabic(text) {
-            if (!text) return "";
-            text = text.toLowerCase();
-            
-            // Remplacements phonétiques basiques
-            const rules = [
-                { regex: /ch/g, rep: 'ش' }, { regex: /ph/g, rep: 'ف' },
-                { regex: /ou/g, rep: 'و' }, { regex: /gue/g, rep: 'غ' },
-                { regex: /gui/g, rep: 'غي' }, { regex: /gu/g, rep: 'غ' },
-                { regex: /qu/g, rep: 'ك' }, { regex: /ce/g, rep: 'س' },
-                { regex: /ci/g, rep: 'سي' }, { regex: /th/g, rep: 'ث' }
-            ];
-            rules.forEach(rule => text = text.replace(rule.regex, rule.rep));
-
-            const map = {
-                'a': 'ا', 'b': 'ب', 'c': 'ك', 'd': 'د', 'e': 'ي', 'f': 'ف',
-                'g': 'غ', 'h': 'ه', 'i': 'ي', 'j': 'ج', 'k': 'ك', 'l': 'ل',
-                'm': 'م', 'n': 'ن', 'o': 'و', 'p': 'ب', 'q': 'ك', 'r': 'ر',
-                's': 'س', 't': 'ت', 'u': 'و', 'v': 'ف', 'w': 'و', 'x': 'كس',
-                'y': 'ي', 'z': 'ز', 'é': 'ي', 'è': 'ي', 'ê': 'ي', ' ': ' '
-            };
-
-            let arabicText = "";
-            for (let char of text) {
-                arabicText += map[char] || char;
-            }
-            return arabicText;
-        }
-
         // Met à jour le champ arabe si l'utilisateur tape en français et que le champ arabe n'a pas été forcé
         let arabicManuallyEdited = false;
-        document.getElementById('fullname_ar').addEventListener('input', () => {
-            arabicManuallyEdited = document.getElementById('fullname_ar').value.trim() !== "";
+        const arInput = document.getElementById('fullname_ar');
+        const frInput = document.getElementById('fullname_fr');
+
+        arInput.addEventListener('input', () => {
+            arabicManuallyEdited = arInput.value.trim() !== "";
         });
 
-        function updateArabicName() {
-            if (!arabicManuallyEdited) {
-                const frName = document.getElementById('fullname_fr').value;
-                document.getElementById('fullname_ar').value = transliterateToArabic(frName);
+        // Fonction asynchrone pour interroger l'API Google Input Tools
+        async function fetchGoogleTransliteration(text) {
+            if (!text) return "";
+            
+            // L'API Google prend des mots séparés, on va translitérer chaque mot
+            const words = text.split(' ');
+            let arabicWords = [];
+
+            try {
+                for (let word of words) {
+                    if (word.trim() === "") continue;
+                    
+                    // URL de l'API publique Google Input Tools
+                    const url = `https://inputtools.google.com/request?text=${encodeURIComponent(word)}&itc=ar-t-i0-und&num=1&cp=0&cs=1&ie=utf-8&oe=utf-8&app=demopage`;
+                    
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    if (data[0] === 'SUCCESS' && data[1] && data[1][0] && data[1][0][1]) {
+                        // Récupère la première (et meilleure) suggestion
+                        arabicWords.push(data[1][0][1][0]);
+                    } else {
+                        // En cas d'échec sur un mot, on garde le mot original
+                        arabicWords.push(word);
+                    }
+                }
+                return arabicWords.join(' ');
+            } catch (error) {
+                console.error("Erreur lors de la translittération:", error);
+                return text; // Retourne le texte original en cas d'erreur de connexion
             }
         }
 
+        // Appelée quand on quitte le champ Français (onblur)
+        async function updateArabicName() {
+            updateCertificate(); // Met à jour le côté FR immédiatement
+            
+            if (!arabicManuallyEdited) {
+                const frName = frInput.value.trim();
+                if (frName) {
+                    arInput.placeholder = "Génération en cours...";
+                    const arName = await fetchGoogleTransliteration(frName);
+                    
+                    // Vérifie que l'utilisateur n'a pas commencé à taper en arabe entre temps
+                    if (!arabicManuallyEdited) {
+                        arInput.value = arName;
+                        updateCertificate(); // Met à jour le côté AR
+                    }
+                    arInput.placeholder = "Ex: كيفين لوجران";
+                } else {
+                    arInput.value = "";
+                    updateCertificate();
+                }
+            }
+        }
+
+        // --- Reste du code inchangé ---
         function updateCertificate() {
             const frName = document.getElementById('fullname_fr').value || '[Prénom NOM]';
             const arName = document.getElementById('fullname_ar').value || '[الاسم واللقب]';
@@ -249,6 +272,7 @@
             const formatDate = (dateStr) => {
                 if(!dateStr) return '[JJ/MM/AAAA]';
                 const parts = dateStr.split('-');
+                if(parts.length !== 3) return '[JJ/MM/AAAA]';
                 return `${parts[2]}/${parts[1]}/${parts[0]}`;
             };
 
