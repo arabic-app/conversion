@@ -47,7 +47,10 @@
             padding: 20mm; /* Marges du document */
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
             box-sizing: border-box;
-            position: relative;
+            
+            /* MODIFICATION ICI : Flexbox pour éviter la superposition */
+            display: flex;
+            flex-direction: column;
         }
         
         /* En-tête (Header) */
@@ -92,7 +95,7 @@
         /* Contenu du texte */
         .text-ar { 
             direction: rtl; text-align: justify; font-size: 20px; 
-            font-family: 'Times New Roman', serif; line-height: 1.8; margin-bottom: 40px; 
+            font-family: 'Times New Roman', serif; line-height: 1.8; margin-bottom: 30px; 
         }
         .text-fr { 
             text-align: justify; font-size: 15px; 
@@ -100,19 +103,24 @@
         }
         
         /* Signatures */
-        .signatures { display: flex; justify-content: space-around; margin-top: 60px; }
+        .signatures { 
+            display: flex; 
+            justify-content: space-around; 
+            margin-top: 40px; 
+            margin-bottom: 20px; 
+        }
         .signature-box { text-align: center; }
         .sig-ar { font-weight: bold; font-family: 'Times New Roman', serif; font-size: 20px; margin-bottom: 5px;}
         .sig-fr { font-weight: bold; font-size: 15px;}
         
         /* Pied de page */
         .footer { 
-            position: absolute;
-            bottom: 20mm;
-            left: 20mm;
-            right: 20mm;
-            text-align: center; font-size: 11px; 
-            border-top: 1px solid #000; padding-top: 10px;
+            /* MODIFICATION ICI : Pousse le pied de page naturellement vers le bas */
+            margin-top: auto;
+            text-align: center; 
+            font-size: 11px; 
+            border-top: 1px solid #000; 
+            padding-top: 10px;
         }
 
         /* Mode Impression (Génération PDF) */
@@ -226,17 +234,15 @@
                     const data = await response.json();
                     
                     if (data[0] === 'SUCCESS' && data[1] && data[1][0] && data[1][0][1]) {
-                        // Récupère la première (et meilleure) suggestion
                         arabicWords.push(data[1][0][1][0]);
                     } else {
-                        // En cas d'échec sur un mot, on garde le mot original
                         arabicWords.push(word);
                     }
                 }
                 return arabicWords.join(' ');
             } catch (error) {
                 console.error("Erreur lors de la translittération:", error);
-                return text; // Retourne le texte original en cas d'erreur de connexion
+                return text;
             }
         }
 
@@ -250,7 +256,6 @@
                     arInput.placeholder = "Génération en cours...";
                     const arName = await fetchGoogleTransliteration(frName);
                     
-                    // Vérifie que l'utilisateur n'a pas commencé à taper en arabe entre temps
                     if (!arabicManuallyEdited) {
                         arInput.value = arName;
                         updateCertificate(); // Met à jour le côté AR
@@ -263,7 +268,6 @@
             }
         }
 
-        // --- Reste du code inchangé ---
         function updateCertificate() {
             const frName = document.getElementById('fullname_fr').value || '[Prénom NOM]';
             const arName = document.getElementById('fullname_ar').value || '[الاسم واللقب]';
