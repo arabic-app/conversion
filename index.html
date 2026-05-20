@@ -4,10 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attestation de Conversion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
     <style>
+        /* Variables Material Design */
+        :root {
+            --primary-color: #1a73e8; /* Bleu Google */
+            --primary-hover: #1557b0;
+            --background-color: #f5f5f6;
+            --surface-color: #ffffff;
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --border-color: #dadce0;
+            --input-bg: #f1f3f4;
+        }
+
         /* Styles de base pour l'écran */
         body { 
-            font-family: 'Arial', sans-serif; 
+            font-family: 'Roboto', 'Arial', sans-serif; 
             margin: 0; 
             padding: 20px; 
             background: #525659; /* Couleur de fond style visionneuse PDF */
@@ -17,52 +32,122 @@
         }
         .bold { font-weight: bold; }
 
-        /* Formulaire (RESPONSIVE) */
+        /* --- FORMULAIRE MATERIAL DESIGN --- */
         .form-container {
-            width: 100%; /* S'adapte à l'écran sur mobile */
-            max-width: 210mm; /* Bloque la taille max sur ordinateur */
-            background: white; 
-            padding: 20px;
-            border-radius: 8px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%; 
+            max-width: 210mm; 
+            background: var(--surface-color); 
+            padding: 30px;
+            border-radius: 12px; 
+            /* Ombre Material */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08);
             margin-bottom: 20px;
             box-sizing: border-box;
+            color: var(--text-primary);
         }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #444; }
-        .form-group input, .form-group select { 
-            width: 100%; padding: 10px; box-sizing: border-box; 
-            border: 1px solid #ccc; border-radius: 4px;
-        }
-        .btn { 
-            background: #28a745; color: white; border: none; 
-            padding: 15px; cursor: pointer; border-radius: 4px; 
-            font-size: 16px; width: 100%; font-weight: bold;
+        
+        .form-title {
+            text-align: center;
+            font-weight: 500;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: var(--text-primary);
         }
 
-        /* Conteneur pour permettre le scroll de la feuille A4 sur smartphone */
+        .form-group { margin-bottom: 20px; position: relative; }
+        
+        .form-group label { 
+            display: block; 
+            font-weight: 500; 
+            margin-bottom: 8px; 
+            color: var(--text-secondary); 
+            font-size: 14px;
+        }
+        
+        /* Champs de saisie Material */
+        .form-group input, .form-group select { 
+            width: 100%; 
+            padding: 12px 16px; 
+            box-sizing: border-box; 
+            border: 1px solid var(--border-color); 
+            border-radius: 4px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            background-color: var(--input-bg);
+            transition: all 0.2s ease;
+            color: var(--text-primary);
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--surface-color);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2); /* Halo bleu au focus */
+        }
+        
+        .form-group i.hint {
+            font-style: italic;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Bouton Material */
+        .btn { 
+            background: var(--primary-color); 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            font-size: 16px; 
+            font-weight: 500;
+            width: 100%; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Roboto', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            /* Ombre du bouton */
+            box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);
+            transition: background-color 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+        
+        .btn:hover { 
+            background: var(--primary-hover); 
+            box-shadow: 0 2px 4px -1px rgba(0,0,0,.2), 0 4px 5px 0 rgba(0,0,0,.14), 0 1px 10px 0 rgba(0,0,0,.12);
+        }
+        
+        .btn:active {
+            box-shadow: 0 5px 5px -3px rgba(0,0,0,.2), 0 8px 10px 1px rgba(0,0,0,.14), 0 3px 14px 2px rgba(0,0,0,.12);
+        }
+
+        /* --- CONTENEUR DU CERTIFICAT A4 (INCHANGÉ POUR L'IMPRESSION) --- */
         .preview-wrapper {
             width: 100%;
             max-width: 210mm;
-            overflow-x: auto; /* Permet le swipe horizontal sur petit écran */
-            padding-bottom: 15px; /* Évite que la barre de scroll ne cache du texte */
+            overflow-x: auto; 
+            padding-bottom: 15px; 
         }
 
-        /* Conteneur du Certificat - FORMAT A4 EXACT */
         .page-a4 {
             width: 210mm;
-            min-width: 210mm; /* Force la feuille à rester au format A4 même sur mobile */
+            min-width: 210mm; 
             height: 297mm; 
             background: white;
-            padding: 20mm; /* Marges du document */
+            padding: 20mm; 
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
             box-sizing: border-box;
-            
             display: flex;
             flex-direction: column;
+            color: black; /* Force le noir à l'impression */
+            font-family: 'Arial', sans-serif; /* Conserve l'Arial pour le document officiel */
         }
         
-        /* En-tête (Header) */
         .header { 
             display: flex; 
             justify-content: space-between; 
@@ -84,7 +169,6 @@
             width: 30%;
         }
         
-        /* LOGO */
         .logo {
             max-width: 120px;
             max-height: 120px;
@@ -101,7 +185,6 @@
             font-family: 'Times New Roman', serif; direction: rtl;
         }
         
-        /* Contenu du texte */
         .text-ar { 
             direction: rtl; text-align: justify; font-size: 20px; 
             font-family: 'Times New Roman', serif; line-height: 1.8; margin-bottom: 30px; 
@@ -111,7 +194,6 @@
             line-height: 1.6; margin-bottom: 20px; 
         }
         
-        /* Signatures */
         .signatures { 
             display: flex; 
             justify-content: space-around; 
@@ -122,21 +204,20 @@
         .sig-ar { font-weight: bold; font-family: 'Times New Roman', serif; font-size: 20px; margin-bottom: 5px;}
         .sig-fr { font-weight: bold; font-size: 15px;}
         
-        /* Pied de page */
         .footer { 
-            margin-top: auto; /* Pousse naturellement tout en bas grâce au Flexbox */
+            margin-top: auto; 
             text-align: center; 
             font-size: 11px; 
             border-top: 1px solid #000; 
             padding-top: 10px;
         }
 
-        /* Mode Impression (Génération PDF) */
+        /* Mode Impression */
         @media print {
             body, html { background: white; padding: 0; margin: 0; display: block; }
             .form-container { display: none !important; }
             .preview-wrapper { 
-                overflow: visible; /* Essentiel pour ne rien couper à l'impression */
+                overflow: visible; 
                 margin: 0;
                 padding: 0;
             }
@@ -144,40 +225,49 @@
                 box-shadow: none; 
                 margin: 0;
                 width: 210mm; 
-                height: 297mm; /* IMPORTANT : maintient la page A4 rigide à l'impression */
+                height: 297mm; 
             }
-            @page { size: A4; margin: 0; } /* Supprime les marges par défaut du navigateur */
+            @page { size: A4; margin: 0; } 
         }
     </style>
 </head>
 <body>
 
     <div class="form-container">
-        <center><h2>ATTESTATION DE CONVERSION A L'ISLAM</h2></center>
+        <h2 class="form-title">Attestation de Conversion</h2>
+        
         <div class="form-group">
-            <label>Prénom NOM (en français) :</label>
+            <label for="fullname_fr">Prénom NOM (en français)</label>
             <input type="text" id="fullname_fr" placeholder="Ex: Kevin LEGRAND" onblur="updateArabicName()">
         </div>
+        
         <div class="form-group">
-            <label>Prénom NOM (en arabe) - <i>Généré via Google si vide</i> :</label>
+            <label for="fullname_ar">Prénom NOM (en arabe) <i class="hint">Généré via Google si vide</i></label>
             <input type="text" id="fullname_ar" dir="rtl" placeholder="Ex: كيفين لوجران" oninput="updateCertificate()">
         </div>
+        
         <div class="form-group">
-            <label>Genre :</label>
+            <label for="gender">Genre</label>
             <select id="gender" onchange="updateCertificate()">
                 <option value="m">Masculin (Frère)</option>
                 <option value="f">Féminin (Sœur)</option>
             </select>
         </div>
+        
         <div class="form-group">
-            <label>Date de naissance :</label>
+            <label for="dob">Date de naissance</label>
             <input type="date" id="dob" onchange="updateCertificate()">
         </div>
+        
         <div class="form-group">
-            <label>Date de reconversion :</label>
+            <label for="doc">Date de reconversion</label>
             <input type="date" id="doc" onchange="updateCertificate()">
         </div>
-        <button class="btn" onclick="window.print()">🖨️ Générer le PDF (Imprimer)</button>
+        
+        <button class="btn" onclick="window.print()">
+            <span class="material-icons">print</span>
+            Générer le PDF
+        </button>
     </div>
 
     <div class="preview-wrapper">
@@ -224,7 +314,6 @@
     </div>
 
     <script>
-        // Met à jour le champ arabe si l'utilisateur tape en français et que le champ arabe n'a pas été forcé
         let arabicManuallyEdited = false;
         const arInput = document.getElementById('fullname_ar');
         const frInput = document.getElementById('fullname_fr');
@@ -233,21 +322,15 @@
             arabicManuallyEdited = arInput.value.trim() !== "";
         });
 
-        // Fonction asynchrone pour interroger l'API Google Input Tools
         async function fetchGoogleTransliteration(text) {
             if (!text) return "";
-            
-            // L'API Google prend des mots séparés, on va translitérer chaque mot
             const words = text.split(' ');
             let arabicWords = [];
 
             try {
                 for (let word of words) {
                     if (word.trim() === "") continue;
-                    
-                    // URL de l'API publique Google Input Tools
                     const url = `https://inputtools.google.com/request?text=${encodeURIComponent(word)}&itc=ar-t-i0-und&num=1&cp=0&cs=1&ie=utf-8&oe=utf-8&app=demopage`;
-                    
                     const response = await fetch(url);
                     const data = await response.json();
                     
@@ -264,9 +347,8 @@
             }
         }
 
-        // Appelée quand on quitte le champ Français (onblur)
         async function updateArabicName() {
-            updateCertificate(); // Met à jour le côté FR immédiatement
+            updateCertificate(); 
             
             if (!arabicManuallyEdited) {
                 const frName = frInput.value.trim();
@@ -276,7 +358,7 @@
                     
                     if (!arabicManuallyEdited) {
                         arInput.value = arName;
-                        updateCertificate(); // Met à jour le côté AR
+                        updateCertificate(); 
                     }
                     arInput.placeholder = "Ex: كيفين لوجران";
                 } else {
@@ -304,14 +386,12 @@
             const todayObj = new Date();
             const today = `${String(todayObj.getDate()).padStart(2, '0')}/${String(todayObj.getMonth() + 1).padStart(2, '0')}/${todayObj.getFullYear()}`;
 
-            // Adaptations Arabes
             const arTitle = gender === 'm' ? 'الأخ' : 'الأخت';
             const arBorn = gender === 'm' ? 'المولود' : 'المولودة';
             const arEmbraced = gender === 'm' ? 'اعتنق' : 'اعتنقت';
             const arPronounced = gender === 'm' ? 'نطق' : 'نطقت';
             const arTo = gender === 'm' ? 'له' : 'لها';
 
-            // Adaptations Françaises
             const frTitle = gender === 'm' ? 'le frère' : 'la sœur';
             const frBorn = gender === 'm' ? 'né' : 'née';
             const frPronoun = gender === 'm' ? 'il a' : 'elle a';
