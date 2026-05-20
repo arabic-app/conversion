@@ -17,9 +17,10 @@
         }
         .bold { font-weight: bold; }
 
-        /* Formulaire */
+        /* Formulaire (RESPONSIVE) */
         .form-container {
-            width: 210mm; /* Largeur A4 pour correspondre au doc */
+            width: 100%; /* S'adapte à l'écran sur mobile */
+            max-width: 210mm; /* Bloque la taille max sur ordinateur */
             background: white; 
             padding: 20px;
             border-radius: 8px; 
@@ -39,10 +40,19 @@
             font-size: 16px; width: 100%; font-weight: bold;
         }
 
+        /* Conteneur pour permettre le scroll de la feuille A4 sur smartphone */
+        .preview-wrapper {
+            width: 100%;
+            max-width: 210mm;
+            overflow-x: auto; /* Permet le swipe horizontal sur petit écran */
+            padding-bottom: 15px; /* Évite que la barre de scroll ne cache du texte */
+        }
+
         /* Conteneur du Certificat - FORMAT A4 EXACT */
         .page-a4 {
             width: 210mm;
-            height: 297mm; /* Force la hauteur à un format A4 */
+            min-width: 210mm; /* Force la feuille à rester au format A4 même sur mobile */
+            height: 297mm; 
             background: white;
             padding: 20mm; /* Marges du document */
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
@@ -123,8 +133,13 @@
 
         /* Mode Impression (Génération PDF) */
         @media print {
-            body, html { background: white; padding: 0; margin: 0; }
+            body, html { background: white; padding: 0; margin: 0; display: block; }
             .form-container { display: none !important; }
+            .preview-wrapper { 
+                overflow: visible; /* Essentiel pour ne rien couper à l'impression */
+                margin: 0;
+                padding: 0;
+            }
             .page-a4 { 
                 box-shadow: none; 
                 margin: 0;
@@ -165,44 +180,46 @@
         <button class="btn" onclick="window.print()">🖨️ Générer le PDF (Imprimer)</button>
     </div>
 
-    <div class="page-a4">
-        <div class="header">
-            <div class="header-left">
-                <span class="bold">Mosquée Al Houda</span><br>
-                9 Rue Edith Piaf<br>
-                Clermont-Ferrand 63100<br>
-                France
+    <div class="preview-wrapper">
+        <div class="page-a4">
+            <div class="header">
+                <div class="header-left">
+                    <span class="bold">Mosquée Al Houda</span><br>
+                    9 Rue Edith Piaf<br>
+                    Clermont-Ferrand 63100<br>
+                    France
+                </div>
+                <div class="header-center">
+                    <p class="title-ar">شهادة اعتناق الإسلام</p>
+                    <p class="title-fr">ATTESTATION DE CONVERSION A L'ISLAM</p>
+                    <p class="subtitle">Masjid Al Houda<br>De Clermont-Ferrand</p>
+                </div>
+                <div class="header-right">
+                    <img src="https://raw.githubusercontent.com/arabic-app/conversion/main/logo_al_houda_3.png" alt="Logo" class="logo" id="mosque-logo">
+                </div>
             </div>
-            <div class="header-center">
-                <p class="title-ar">شهادة اعتناق الإسلام</p>
-                <p class="title-fr">ATTESTATION DE CONVERSION A L'ISLAM</p>
-                <p class="subtitle">Masjid Al Houda<br>De Clermont-Ferrand</p>
-            </div>
-            <div class="header-right">
-                <img src="https://raw.githubusercontent.com/arabic-app/conversion/main/logo_al_houda_3.png" alt="Logo" class="logo" id="mosque-logo">
-            </div>
-        </div>
 
-        <div class="bismillah">
-            بسم الله الرحمن الرحيم وصلى الله وسلم على محمد وعلى آله وصحبه وبعد،
-        </div>
-
-        <div id="ar-content" class="text-ar"></div>
-        <div id="fr-content" class="text-fr"></div>
-
-        <div class="signatures">
-            <div class="signature-box">
-                <div class="sig-ar">رئيس الجمعية</div>
-                <div class="sig-fr">Président de l'association</div>
+            <div class="bismillah">
+                بسم الله الرحمن الرحيم وصلى الله وسلم على محمد وعلى آله وصحبه وبعد،
             </div>
-            <div class="signature-box">
-                <div class="sig-ar">إمام المسجد</div>
-                <div class="sig-fr">Imam de la mosquée</div>
-            </div>
-        </div>
 
-        <div class="footer">
-            Déclaration au Journal Officiel de la préfecture du Puy-de-Dôme FRANCE, ASSOCIATION DES JEUNES D'AUVERGNE POUR LE BIEN. Annonce n° 547 63
+            <div id="ar-content" class="text-ar"></div>
+            <div id="fr-content" class="text-fr"></div>
+
+            <div class="signatures">
+                <div class="signature-box">
+                    <div class="sig-ar">رئيس الجمعية</div>
+                    <div class="sig-fr">Président de l'association</div>
+                </div>
+                <div class="signature-box">
+                    <div class="sig-ar">إمام المسجد</div>
+                    <div class="sig-fr">Imam de la mosquée</div>
+                </div>
+            </div>
+
+            <div class="footer">
+                Déclaration au Journal Officiel de la préfecture du Puy-de-Dôme FRANCE, ASSOCIATION DES JEUNES D'AUVERGNE POUR LE BIEN. Annonce n° 547 63
+            </div>
         </div>
     </div>
 
