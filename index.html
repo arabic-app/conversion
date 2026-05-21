@@ -69,7 +69,7 @@
         .input-with-action {
             display: flex;
             gap: 10px;
-            align-items: stretch;
+            align-items: center;
         }
         .input-with-action input {
             flex-grow: 1;
@@ -78,7 +78,8 @@
         /* Champs de saisie Material */
         .form-group input, .form-group select { 
             width: 100%; 
-            padding: 12px 16px; 
+            height: 46px; /* Hauteur fixe unifiée */
+            padding: 0 16px; 
             box-sizing: border-box; 
             border: 1px solid var(--border-color); 
             border-radius: 4px;
@@ -123,30 +124,27 @@
             font-family: 'Roboto', sans-serif;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            /* Ombre du bouton */
             box-shadow: 0 3px 1px -2px rgba(0,0,0,.2), 0 2px 2px 0 rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);
             transition: background-color 0.2s, box-shadow 0.2s;
             margin-top: 10px;
         }
 
-        /* Bouton secondaire pour l'action de translittération */
+        /* Bouton secondaire icône sans libellé ajusté à 46px */
         .btn-secondary {
             background: transparent;
             color: var(--primary-color);
             border: 1px solid var(--border-color);
-            padding: 0 16px;
+            width: 46px;
+            height: 46px;
+            min-width: 46px;
+            padding: 0;
             cursor: pointer;
             border-radius: 4px;
-            font-size: 14px;
-            font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 5px;
-            font-family: 'Roboto', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            justify-content: center;
             transition: background-color 0.2s, border-color 0.2s;
-            white-space: nowrap;
+            box-sizing: border-box;
         }
         .btn-secondary:hover {
             background-color: rgba(26, 115, 232, 0.04);
@@ -251,18 +249,6 @@
             padding-top: 10px;
         }
 
-        /* Reponsive smartphone pour l'alignement du bouton de translittération */
-        @media (max-width: 600px) {
-            .input-with-action {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            .btn-secondary {
-                padding: 12px;
-                justify-content: center;
-            }
-        }
-
         /* Mode Impression */
         @media print {
             body, html { background: white; padding: 0; margin: 0; display: block; }
@@ -297,10 +283,10 @@
             <div class="input-with-action">
                 <input type="text" id="fullname_ar" dir="rtl" placeholder="Ex: كيفين لوجران" oninput="updateCertificate()">
                 <button type="button" class="btn-secondary" onclick="generateArabicName()">
-                    <span class="material-icons" style="font-size: 18px;">translate</span>
+                    <span class="material-icons">translate</span>
                 </button>
             </div>
-            <i class="hint">Cliquez sur Translittérer pour générer le nom automatiquement via Google</i>
+            <i class="hint">Cliquez sur l'icône pour générer le nom automatiquement via Google</i>
         </div>
         
         <div class="form-group">
@@ -398,7 +384,6 @@
             }
         }
 
-        // Nouvelle fonction déclenchée uniquement au clic sur le bouton à côté du champ
         async function generateArabicName() {
             const frName = frInput.value.trim();
             if (frName) {
@@ -406,7 +391,7 @@
                 const arName = await fetchGoogleTransliteration(frName);
                 arInput.value = arName;
                 arInput.placeholder = "Ex: كيفين لوجران";
-                updateCertificate(); // Met à jour le visuel du certificat
+                updateCertificate();
             }
         }
 
@@ -415,18 +400,31 @@
             const arName = document.getElementById('fullname_ar').value || '[الاسم واللقب]';
             const gender = document.getElementById('gender').value;
             
-            const formatDate = (dateStr) => {
+            // Format de date stricte pour la partie française (JJ/MM/AAAA)
+            const formatDateFr = (dateStr) => {
                 if(!dateStr) return '[JJ/MM/AAAA]';
                 const parts = dateStr.split('-');
                 if(parts.length !== 3) return '[JJ/MM/AAAA]';
                 return `${parts[2]}/${parts[1]}/${parts[0]}`;
             };
 
-            const dob = formatDate(document.getElementById('dob').value);
-            const doc = formatDate(document.getElementById('doc').value);
+            // Format de date stricte pour la partie arabe (jours / mois / année de droite à gauche sous direction RTL)
+            const formatDateAr = (dateStr) => {
+                if(!dateStr) return '[يوم / شهر / سنة]';
+                const parts = dateStr.split('-');
+                if(parts.length !== 3) return '[يوم / شهر / سنة]';
+                return `${parts[2]} / ${parts[1]} / ${parts[0]}`;
+            };
+
+            const dobFr = formatDateFr(document.getElementById('dob').value);
+            const docFr = formatDateFr(document.getElementById('doc').value);
+
+            const dobAr = formatDateAr(document.getElementById('dob').value);
+            const docAr = formatDateAr(document.getElementById('doc').value);
             
             const todayObj = new Date();
-            const today = `${String(todayObj.getDate()).padStart(2, '0')}/${String(todayObj.getMonth() + 1).padStart(2, '0')}/${todayObj.getFullYear()}`;
+            const todayFr = `${String(todayObj.getDate()).padStart(2, '0')}/${String(todayObj.getMonth() + 1).padStart(2, '0')}/${todayObj.getFullYear()}`;
+            const todayAr = `${String(todayObj.getDate()).padStart(2, '0')} / ${String(todayObj.getMonth() + 1).padStart(2, '0')} / ${todayObj.getFullYear()}`;
 
             const arTitle = gender === 'm' ? 'الأخ' : 'الأخت';
             const arBorn = gender === 'm' ? 'المولود' : 'المولودة';
@@ -440,15 +438,15 @@
 
             document.getElementById('ar-content').innerHTML = `
                 أنا الممضي أسفله، عز الدين خامله، إمام مسجد الهدى بمدينة كلارمون فارون بفرنسا، أشهد أن<br>
-                ${arTitle} <span class="bold">${arName}</span> ${arBorn} بتاريخ <span class="bold">${dob}</span> ${arEmbraced} بفضل الله الدين الإسلامي. وقد ${arPronounced} بالشهادتين منذ <span class="bold">${doc}</span><br>
+                ${arTitle} <span class="bold">${arName}</span> ${arBorn} بتاريخ <span class="bold">${dobAr}</span> ${arEmbraced} بفضل الله الدين الإسلامي. وقد ${arPronounced} بالشهادتين منذ <span class="bold">${docAr}</span><br>
                 وقد منحت ${arTo} هذه الشهادة للإدلاء بها عند الحاجة.<br>
-                حرر في كلارمون فارون بتاريخ <span class="bold">${today}</span>
+                حرر في كلارمون فارون بتاريخ <span class="bold">${todayAr}</span>
             `;
 
             document.getElementById('fr-content').innerHTML = `
-                Je soussigné, Azedine KHAMALLAH, Imam de la mosquée Al Houda à CLERMONT FERRAND (France), certifie que ${frTitle} <span class="bold">${frName}</span> ${frBorn} le <span class="bold">${dob}</span> a embrassé l'Islam, par la grâce d'Allah, et ${frPronoun} prononcé l'attestation de foi depuis <span class="bold">${doc}</span>.<br><br>
+                Je soussigné, Azedine KHAMALLAH, Imam de la mosquée Al Houda à CLERMONT FERRAND (France), certifie que ${frTitle} <span class="bold">${frName}</span> ${frBorn} le <span class="bold">${dobFr}</span> a embrassé l'Islam, par la grâce d'Allah, et ${frPronoun} prononcé l'attestation de foi depuis le <span class="bold">${docFr}</span>.<br><br>
                 Ce certificat lui a été délivré pour servir et valoir ce que de droit.<br><br>
-                Fait à Clermont-Ferrand le <span class="bold">${today}</span>
+                Fait à Clermont-Ferrand le <span class="bold">${todayFr}</span>
             `;
         }
 
