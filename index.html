@@ -227,8 +227,8 @@
             font-family: 'Times New Roman', serif; line-height: 1.8; margin-bottom: 30px; 
         }
         .text-fr { 
-            text-align: justify; font-size: 15px; 
-            line-height: 1.6; margin-bottom: 20px; 
+            text-align: justify; font-size: 16.5px; /* Augmenté de 15px à 16.5px */
+            line-height: 1.8; margin-bottom: 20px; /* Interligne harmonisé à 1.8 */
         }
         
         .signatures { 
@@ -247,6 +247,18 @@
             font-size: 11px; 
             border-top: 1px solid #000; 
             padding-top: 10px;
+        }
+
+        /* Reponsive smartphone pour l'alignement du bouton de translittération */
+        @media (max-width: 600px) {
+            .input-with-action {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .btn-secondary {
+                padding: 12px;
+                justify-content: center;
+            }
         }
 
         /* Mode Impression */
